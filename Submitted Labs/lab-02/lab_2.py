@@ -39,23 +39,12 @@ def predict(w, X):
 #   'y' are the true class values
 def cross_entropy(w, X, y):
     # Use the 'predict' function to compute the predicted probability of label 1
-    p = [0] #<replace '[0]' with a call to the predict function>
-
-    # Now compute the cross entropy.
-    #
-    # Because this involves taking logs, you should add 'eps' where necessary to
-    # avoid taking the log of 0.
+    p = predict(w, X)
+    # Ensure shapes match for calculation
+    p = p.reshape(y.shape)
     eps = 0.000001
-
-    # Computation of the cross-entropy can be done in one line using numpy
-    # functions log and mean.
-    
-    # Or it can be done in a more straightforward way: initialize an accumulator
-    # variable to 0, do a 'for' loop over the elements of 'y', and update the
-    # accumulator as appropriate (using 'math.log'). (THIS WILL BE SLOW)
-
-    # Don't forget to return the average rather than the sum.
-    return 0
+    loss = - (y * np.log(p + eps) + (1 - y) * np.log(1 - p + eps))
+    return np.mean(loss)
 
 
 #
@@ -71,9 +60,10 @@ def cross_entropy(w, X, y):
 # differs slightly from the definition in the notes.
 def gradient(w, X, y):
     n = y.shape[0]                 # number of observations
-    p = [0]                        # <replace '[0]' with a call to the predict function>
-    grad = [0]                     # use 'np.dot' to compute the vector
-    return grad / n                # Average over the (number of) observations
+    p = predict(w, X)              # predicted probability of label 1
+    p = p.reshape(y.shape)
+    grad = np.dot(X.T, p - y)      # compute gradient
+    return grad / n
 #
 # #### EXERCISE 3 ####
 #
@@ -82,7 +72,7 @@ def gradient(w, X, y):
 # What learning rate is best for the data set supplied in the notebook?
 # eg. return 45 or return 0.1 (doesn't have to be super precise)
 def question_3():
-    return 0 # <- change this value
+    return 10
 
 #
 # #### EXERCISE 4 ####
@@ -90,8 +80,8 @@ def question_3():
 # Write a function predict_class which uses weights 'w', observations
 # 'X', and a threshold 't' to classify the data.
 def predict_class(w, X, t):
-    # replace with a vector of comparisons of a call to predict with 't':
-    return np.zeros((X.shape[0],1))
+    p = predict(w, X)
+    return (p >= t).astype(int)
     
 
 #
@@ -102,7 +92,7 @@ def predict_class(w, X, t):
 # What is the accuracy of your classifier for a threshold of 0.75
 
 def question_5():
-    return 0 # <- update this with actual accuracy
+    return 0.9698
 
 #
 # #### EXERCISE 6 ####
@@ -113,7 +103,7 @@ def question_5():
 #       and the other coefficients from log_reg.coef_.
 
 def question_6():
-    return 0 # <- change this with estimated bias for logit of class=0
+    return 8.67864029967296
 
 # #### EXERCISE 7 ####
 # 
@@ -140,8 +130,8 @@ def question_6():
 
 def question_7():
     return {
-      'Features': (0,1), # replace with the best pair
-      'Acc': 0.77777     # replace with the accuracy for that pair
+      'Features': (0,2),
+      'Acc': 0.9555555555555556
       }    
 
 
